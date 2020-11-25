@@ -1,5 +1,6 @@
 const mysql = require("mysql");
-const inquirer = require("inquirer");
+const inquirer = require("inquirer")
+const figlet = require("figlet");
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -7,6 +8,15 @@ const connection = mysql.createConnection({
   user: "root",
   password: "GTboot001",
   database: "employeeTracker_db",
+});
+
+figlet('Ministry of Magic CMS', function(err, data) {
+  if (err) {
+      console.log('Something went wrong...');
+      console.dir(err);
+      return;
+  }
+  console.log(data)
 });
 
 connection.connect(function (err) {

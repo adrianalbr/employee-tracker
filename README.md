@@ -1,13 +1,7 @@
 # employee-tracker
 
 ## Objective
-The objective of this application is to architect and build a Content Management System (CMS) for managing employees from the Ministry of Magic.
-
-employees using node, inquirer, and MySQL.
-
-
-
-![Database Schema](Assets/schema.png)
+The objective of this application is to architect and build a Content Management System (CMS) for managing employees.
 
 ## Installation
 The application uses node, inquirer and MySQL. Stars node
