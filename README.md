@@ -25,7 +25,7 @@ This application uses:
 
   * [console.table](https://www.npmjs.com/package/console.table) to print MySQL rows to the console. 
 
-  *[figlet](https://www.npmjs.com/package/figlet) to create the fancy title that is displayed when the application is initiated.
+  * [figlet](https://www.npmjs.com/package/figlet) to create the fancy title that is displayed when the application is initiated.
 
 ## Demo
 ![EmployeeTrackerDemo](Assets/images/employeeTrackerDemo.gif)
