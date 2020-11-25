@@ -163,9 +163,9 @@ function byManager() {
   );
 };
 
-function addEmployee(){
+function addEmployee() {
   let newEmployee = {};
-  connection.query("SELECT * FROM role", function (err, results){
+  connection.query("SELECT * FROM role", function (err, results) {
     if (err) throw err;
     inquirer
       .prompt([
@@ -179,7 +179,6 @@ function addEmployee(){
             }
             return true;
           }
-
         },
 
         {
@@ -207,21 +206,50 @@ function addEmployee(){
           message: "What is the employee's role?",
         }
       ])
-      .then(function (answer){
+      .then(function (answer) {
         newEmployee.first_name = answer.first_name;
         newEmployee.last_name = answer.last_name;
 
         //role to role id
-        
+        connection.query("Select * FROM role WHERE title = ?", answer.role, function (err, results) {
+          if (err) throw err;
+          newEmployee.role_id = results[0].id;
 
+          //what manager
+          connection.query("SELECT * FROM employee;", function (err, results) {
+            if (err) throw err;
+            inquirer
+            .prompt([
+              {
+                name: "manager_name",
+                type: "list",
+                choices: function () {
+                  let choiceArray = [];
+                    for (var i = 0; i < results.length; i++) {
+                      choiceArray.push(results[i].first_name);
+                      }
+                    return choiceArray;
+                    },
+                  message: "Who is the employee's manager?"
+                  }
+            ])
+            .then(function (answer) {
+              connection.query("SELECT id FROM employee WHERE first_name = ?", answer.manager_name, function (err, results) {
+                if (err) throw err;
+                newEmployee.manager_id = results[0].id;
+                console.log ("Adding new employee: ", newEmployee);
 
+                connection.query("INSERT INTO employee SET ?", newEmployee, function (err, results) {
+                  if (err) throw err;
+                  console.log("Employee has been added");
+                  init();
+                })
+              })
+            })
+          })
+        })
       })
-
-
-  }
-  
-  )
-}
+  })};
 
 
 function exit() {
