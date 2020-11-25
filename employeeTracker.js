@@ -23,12 +23,11 @@ function init() {
           "Welcome to the Ministry of Magic Employee Tracker! What you like to do?",
         name: "search",
         choices: [
-          "test",
           "View all employees",
           "View all employees by Department",
           "View all employees by Manager",
           "Add a new employee",
-          "Remove and employee",
+          "Remove employee",
           "Update employee role",
           "Update employee manager",
           "exit",
@@ -37,9 +36,6 @@ function init() {
     ])
     .then(({ search }) => {
       switch (search) {
-        case "test":
-          test();
-          break;
         case "View all employees":
           allEmployees();
           break;
@@ -52,26 +48,26 @@ function init() {
           case "Add a new employee":
           addEmployee();
           break;
+          case "Remove employee":
+          removeEmployee();
+          break;
+          case "Update employee role":
+          updateRole();
+          break;
+          case "Update employee manager":
+          updateManager();
+          break;
         case "exit":
           exit();
           break;
         default:
-          console.log("You have entered an invalid command, please try again");
+          console.log("You have selected an invalid option, please try again");
           init();
       }
     });
 }
 
 //FUNCTIONS
-
-//test
-function test() {
-  connection.query("SELECT * from department;", function (err, data) {
-    if (err) throw err;
-    console.table(data);
-    init();
-  });
-}
 
 //View all employees
 
@@ -86,6 +82,7 @@ function allEmployees() {
   );
 }
 
+// View all employees by department
 function byDepartment() {
   //show all available departments
   connection.query("SELECT * FROM department", function (err, results) {
@@ -128,6 +125,7 @@ function byDepartment() {
   });
 }
 
+//View all employees by Manager
 function byManager() {
   // All distinct managers from employee table
   connection.query(
@@ -163,6 +161,7 @@ function byManager() {
   );
 };
 
+// Add an employee
 function addEmployee() {
   let newEmployee = {};
   connection.query("SELECT * FROM role", function (err, results) {
@@ -251,7 +250,166 @@ function addEmployee() {
       })
   })};
 
+// Remove an employee
+function removeEmployee() {
+    connection.query("SELECT * FROM employee", function (err, results) {
+        if (err) throw err;
+        inquirer
+            .prompt([
+                {
+                    name: "removeEmployee",
+                    type: "list",
+                    choices: function () {
+                        let choiceArray = [];
+                        for (var i = 0; i < results.length; i++) {
+                            choiceArray.push(results[i].first_name);
+                        }
+                        return choiceArray;
+                    },
+                    message: "Which employee would you like to vanish?"
+                }
+            ])
+            .then(function (answer) {
+                let query = 'DELETE FROM employee WHERE first_name = ?;'
+                connection.query(query, answer.removeEmployee, function (err, res) {
+                    if (err) throw err;
+                    console.log("Employee successfully vanished");
+                    init();
+                });
+            });
+    });
+};
 
+//Update specific employee role
+
+function updateRole() {
+  let newRole = {};
+  connection.query(
+    `
+    SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name AS department, e2.first_name AS manager
+    FROM employee
+    LEFT JOIN employee AS e2 ON e2.id = employee.manager_id
+    JOIN role ON employee.role_id = role.id
+    JOIN department ON role.department_id = department.id
+    ORDER BY employee.id;
+    ` ,
+    function (err, results) {
+      if (err) throw err;
+      inquirer
+          .prompt([
+              {
+                  name: "updateEmployee",
+                  type: "list",
+                  choices: function () {
+                      let choiceArray = [];
+                      for (var i = 0; i < results.length; i++) {
+                          choiceArray.push(results[i].first_name);
+                      }
+                      return choiceArray;
+                  },
+                  message: "Which employee would you like to update?"
+              }
+          ])
+          .then(function (answer) {
+              newRole.first_name = answer.updateEmployee;
+              connection.query("SELECT * FROM role", function (err, res) {
+                  if (err) throw err;
+                  inquirer
+                      .prompt([
+                          {
+                              name: "updateRole",
+                              type: "list",
+                              choices: function () {
+                                  let choiceArray = [];
+                                  for (var i = 0; i < results.length; i++) {
+                                      choiceArray.push(results[i].title);
+                                  }
+                                  return choiceArray;
+                              },
+                              message: "What new role would you like to assign to the employee?"
+                          }
+                      ])
+                      .then(function (answer) {
+                          // Translate role to role_id
+                          connection.query("SELECT * FROM role WHERE title = ?", answer.updateRole, function (err, results) {
+                              if (err) throw err;
+
+                              newRole.role_id = results[0].id;
+
+                              connection.query("UPDATE employee SET role_id = ? WHERE first_name = ?", [newRole.role_id, newRole.first_name], function (err, res) {
+                                  if (err) throw (err);
+                                  console.log('Employee role successfully updated.');
+                                  init();
+                              })
+
+                          })
+                      });
+              });
+          });
+  })
+};
+
+//Update specific employee manager
+function updateManager() {
+  let newManager = {};
+  connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name AS department, e2.first_name AS manager FROM employee LEFT JOIN employee AS e2 ON e2.id = employee.manager_id JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id", function (err, results) {
+      if (err) throw err;
+      inquirer
+          .prompt([
+              {
+                  name: "updateEmployee",
+                  type: "list",
+                  choices: function () {
+                      let choiceArray = [];
+                      for (var i = 0; i < results.length; i++) {
+                          choiceArray.push(results[i].first_name);
+                      }
+                      return choiceArray;
+                  },
+                  message: "Which employee would you like to update?"
+              }
+          ])
+          .then(function (answer) {
+
+              newManager.first_name = answer.updateEmployee;
+
+              connection.query("SELECT * FROM employee", function (err, res) {
+                  if (err) throw err;
+                  inquirer
+                      .prompt([
+                          {
+                              name: "updateManager",
+                              type: "list",
+                              choices: function () {
+                                  let choiceArray = [];
+                                  for (var i = 0; i < results.length; i++) {
+                                      choiceArray.push(results[i].first_name);
+                                  }
+                                  return choiceArray;
+                              },
+                              message: "Who would you like to be the new manager?"
+                          }
+                      ])
+                      .then(function (answer) {
+                          connection.query("SELECT * FROM employee WHERE first_name = ?", answer.updateManager, function (err, results) {
+                              if (err) throw err;
+
+                              newManager.manager_id = results[0].id;
+
+                              connection.query("UPDATE employee SET manager_id = ? WHERE first_name = ?", [newManager.manager_id, newManager.first_name], function (err, res) {
+                                  if (err) throw (err);
+                                  console.log('Employee manager successfully updated.');
+                                  init();
+                              })
+
+                          })
+                      });
+              });
+          });
+  })
+};
+
+//Exit
 function exit() {
   connection.end();
 }
