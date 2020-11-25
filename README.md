@@ -4,10 +4,10 @@
 The objective of this application is to architect and build a Content Management System (CMS) for managing employees.
 
 ## Installation
-The application uses node, inquirer and MySQL. Stars node
+The application uses node, inquirer and MySQL. Launch the application using node - node employeeTracker.js
 
 ## How it works
-This application allows the user to:
+This application allows the user to select actions from the following menu:
 
   * View all employees
   * View all employees by Department
@@ -17,19 +17,6 @@ This application allows the user to:
   * Update employee's role
   * Update employee's manager
   
-
-  * View the total utilized budget of a department -- ie the combined salaries of all employees in that department
-
-We can frame this challenge as follows:
-
-```
-As a business owner
-I want to be able to view and manage the departments, roles, and employees in my company
-So that I can organize and plan my business
-```
-
-How do you deliver this? Here are some guidelines:
-
 ## Credits
 This application uses:
   * [MySQL](https://www.npmjs.com/package/mysql) NPM package to connect MySQL database and perform queries.
@@ -38,20 +25,12 @@ This application uses:
 
   * [console.table](https://www.npmjs.com/package/console.table) to print MySQL rows to the console. 
 
+  *[figlet](https://www.npmjs.com/package/figlet) to create the fancy title that is displayed when the application is initiated.
 
+## Demo
+![EmployeeTrackerDemo](Assets/images/employeeTrackerDemo.gif)
 
-![Employee Tracker](Assets/employee-tracker.gif)
-
-
-
-
-## Submission on BCS
-
-You are required to submit the following:
-
-* The URL of the GitHub repository
-
-* A video demonstrating the entirety of the app's functionality 
+Enjoy! and I hope you like the characters featured in the database
 
 - - -
 © 202 Adriana Bonilla-Ramirez. All Rights Reserved.
